@@ -30,6 +30,7 @@ provider:
     PRODUCT_EDITED_DEAD: dead-product-edited-queue-${self:provider.stage}
     PRODUCT_PAYED_QUEUE: product-payed-queue-${self:provider.stage}
     PRODUCT_PAYED_DEAD: dead-product-payed-queue-${self:provider.stage}
+    DYNAMODB_CONFIG_FILE_PATH: configs/${self:provider.stage}-dynamo.yml
 
 package:
   individually: true

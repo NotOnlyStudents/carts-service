@@ -4,15 +4,23 @@ import {
   Context,
   Handler,
 } from 'aws-lambda';
+import { DynamoDB } from 'aws-sdk';
+import { ClientConfiguration } from 'aws-sdk/clients/dynamodb';
+import { parseDocument } from 'yaml';
+import { readFileSync as readFile } from 'fs';
+import getCartToken from 'src/lambdas/getCartToken';
+import DynamoDbCartRepository from 'src/repository/DynamoDbCartRepository';
 
 const handler: Handler = async (
-  // TODO: rename to event
-  _event: APIGatewayProxyEvent,
+  event: APIGatewayProxyEvent,
   _context: Context,
   callback: Callback,
 ) => {
   try {
-    // callback(null, await getCart(event));
+    const dynamoConfig: ClientConfiguration = parseDocument(readFile(process.env.DYNAMODB_CONFIG_FILE_PATH, 'utf-8')).toJSON();
+    const repository = new DynamoDbCartRepository(new DynamoDB(dynamoConfig));
+
+    callback(null, await getCartToken(event, repository));
   } catch (error) {
     callback(error);
   }
