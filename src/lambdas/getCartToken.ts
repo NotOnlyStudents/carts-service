@@ -7,11 +7,11 @@ const getCartToken = async (
   event: APIGatewayProxyEvent,
   repository: CartRepositoryGet,
 ): Promise<CartResponse> => {
-  const { id } = event.pathParameters;
+  const { cartId } = event.pathParameters;
 
   try {
-    const cart = await repository.getCart(id);
-    const { products } = cart;
+    const cart = await repository.getCart(cartId);
+    const { products } = await cart;
 
     // TODO: timeout date&time, hmac calculation
     return new CartResponse(200, {
@@ -24,7 +24,9 @@ const getCartToken = async (
       hmac: '',
     });
   } catch (error) {
-    if (error instanceof ItemNotFoundException) return new CartResponse(404);
+    if (error instanceof ItemNotFoundException) return new CartResponse(404, { 
+      message: `Cart with id ${cartId} not found`
+    });
     return new CartResponse(500);
   }
 };

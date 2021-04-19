@@ -1,4 +1,3 @@
-import { embed } from '@aws/dynamodb-data-mapper';
 import {
   attribute,
   hashKey,
@@ -29,10 +28,10 @@ class DynamoDbProduct implements Product {
   @attribute()
   evidence: boolean;
 
-  @attribute({ memberType: embed(String) })
+  @attribute()
   categories: string[];
 
-  @attribute({ memberType: embed(String) })
+  @attribute()
   images: string[];
 
   constructor(id = '', name = '', description = '', price = 0.0, quantity = 1, available = true, evidence = false, categories = [], images = []) {
