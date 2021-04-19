@@ -1,6 +1,6 @@
 {
   "Table": {
-    "TableName": "products-table",
+    "TableName": "carts-table-dev",
     "KeySchema": [
       {
         "AttributeName": "id",
