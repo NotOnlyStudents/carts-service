@@ -42,24 +42,24 @@ plugins:
   - serverless-offline
 
 functions:
-  # editCart:
-  #   handler: src/endpoints/editCart.handler
-  #   description: New content of the buyer's cart
-  #   events:
-  #     - http:
-  #         path: cart
-  #         method: PATCH
-  #         cors: true
-  #         authorizer: 
-  #           type: COGNITO_USER_POOLS
-  #           authorizerId:
-  #             Ref: ApiGatewayAuthorizer
+  editCart:
+    handler: src/endpoints/editCart.default
+    description: New content of the buyer's cart
+    events:
+      - http:
+          path: cart
+          method: PATCH
+          cors: true
+          authorizer: 
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
   getCartToken:
     handler: src/endpoints/getCartToken.default
     description: Obtain information about a user personal cart
     events:
       - http:
-          path: cart/{cartId}
+          path: cart
           method: GET
           cors: true
           authorizer: 
@@ -214,7 +214,7 @@ resources:
       Properties:
         AuthorizerResultTtlInSeconds: 300
         IdentitySource: method.request.header.Authorization
-        Name: Cognito
+        Name: cognito-${self:provider.stage}
         RestApiId: 
           Ref: ApiGatewayRestApi
         Type: COGNITO_USER_POOLS
@@ -237,7 +237,7 @@ custom:
     migration:
       dir: ./offline
     seed: 
-        cart:
-          sources:
-            - table: ${self:provider.environment.CARTS_TABLE}
-              sources: [./offline/seeds/carts.json]
+      cart:
+        sources:
+          - table: ${self:provider.environment.CARTS_TABLE}
+            sources: [./offline/seeds/carts.json]
