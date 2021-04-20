@@ -1,9 +1,10 @@
 interface Token<T> {
-  token: {
+  readonly token: {
     data: T;
     timeout: Date;
   },
-  hmac: string
+  readonly hmac: string,
+  signToken: () => string
 }
 
 export default Token;
