@@ -6,6 +6,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
+  region: eu-west-1
   stage: ${opt:stage, "dev"}
   apiGateway:
     shouldStartNameWithService: true
@@ -24,12 +25,12 @@ provider:
   environment:
     CARTS_TABLE: carts-table-${self:provider.stage}
     PRODUCTS_TABLE: products-table-${self:provider.stage}
-    PRODUCT_DELETED_QUEUE: product-deleted-queue-${self:provider.stage}
-    PRODUCT_DELETED_DEAD: dead-product-deleted-queue-${self:provider.stage}
-    PRODUCT_EDITED_QUEUE: product-edited-queue-${self:provider.stage}
-    PRODUCT_EDITED_DEAD: dead-product-edited-queue-${self:provider.stage}
-    PRODUCT_PAYED_QUEUE: product-payed-queue-${self:provider.stage}
-    PRODUCT_PAYED_DEAD: dead-product-payed-queue-${self:provider.stage}
+    PRODUCT_DELETED_QUEUE: product-deleted-queue-${self:provider.stage}.fifo
+    PRODUCT_DELETED_DEAD: dead-product-deleted-queue-${self:provider.stage}.fifo
+    PRODUCT_EDITED_QUEUE: product-edited-queue-${self:provider.stage}.fifo
+    PRODUCT_EDITED_DEAD: dead-product-edited-queue-${self:provider.stage}.fifo
+    PAYED_CART_QUEUE: payed-cart-queue-${self:provider.stage}.fifo
+    PAYED_CART_DEAD: dead-payed-cart-queue-${self:provider.stage}.fifo
     DYNAMODB_CONFIG_FILE_PATH: configs/${self:provider.stage}-dynamo.yml
 
 package:
@@ -73,9 +74,11 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:provider.environment.PRODUCT_EDITED_QUEUE}
+        FifoQueue: true
         DelaySeconds: 0
         VisibilityTimeout: 30
         RedrivePolicy:
+          maxReceiveCount: 1
           deadLetterTargetArn:
             !GetAtt 'DeadEditedProduct.Arn'
 
@@ -83,6 +86,7 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: ${self:provider.environment.PRODUCT_EDITED_DEAD}
+        FifoQueue: true
         MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
 
     SqsEditedProductPolicy:
@@ -91,7 +95,6 @@ resources:
         Queues:
           - Ref: ProductEditedQueue
         PolicyDocument:
-          Version: "2021-04-19"
           Statement:
             - Effect: Allow
               Principal: '*'
@@ -111,62 +114,67 @@ resources:
         Protocol: "sqs"
         TopicArn: arn:aws:sns:eu-west-1:501082649462:ProductEdited.fifo
 
-    ProductPayedQueue:
+    PayedCartQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: ${self:provider.environment.PRODUCT_PAYED_QUEUE}
+        QueueName: ${self:provider.environment.PAYED_CART_QUEUE}
+        FifoQueue: true
         DelaySeconds: 0
         VisibilityTimeout: 30
         RedrivePolicy:
+          maxReceiveCount: 1
           deadLetterTargetArn:
-            !GetAtt 'DeadPayedProduct.Arn'
+            !GetAtt 'DeadPayedCart.Arn'
 
-    DeadPayedProduct:
+    DeadPayedCart:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: ${self:provider.environment.PRODUCT_PAYED_DEAD}
+        QueueName: ${self:provider.environment.PAYED_CART_DEAD}
+        FifoQueue: true
         MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
 
-    SqsPayedProductPolicy:
+    SqsPayedCartPolicy:
       Type: AWS::SQS::QueuePolicy
       Properties:
         Queues:
-          - Ref: ProductPayedQueue
+          - Ref: PayedCartQueue
         PolicyDocument:
-          Version: "2021-04-19"
           Statement:
             - Effect: Allow
               Principal: '*'
               Action:
                 - sqs:SendMessage
               Resource:
-                !GetAtt 'ProductPayedQueue.Arn'
+                !GetAtt 'PayedCartQueue.Arn'
               Condition:
                 ArnEquals:
-                  'aws:SourceArn': arn:aws:sns:eu-west-1:501082649462:ProductPayed.fifo
+                  'aws:SourceArn': arn:aws:sns:eu-west-1:501082649462:PayedCart.fifo
 
-    ProductPayedTopicSubscription:
+    PayedCartTopicSubscription:
       Type: AWS::SNS::Subscription
       Properties:
         Endpoint:
-          !GetAtt 'ProductPayedQueue.Arn'
+          !GetAtt 'PayedCartQueue.Arn'
         Protocol: "sqs"
-        TopicArn: arn:aws:sns:eu-west-1:501082649462:ProductPayed.fifo
+        TopicArn: arn:aws:sns:eu-west-1:501082649462:PayedCart.fifo
     
     ProductDeletedQueue:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:provider.environment.PRODUCT_DELETED_QUEUE}
+        FifoQueue: true
         DelaySeconds: 0
         VisibilityTimeout: 30
         RedrivePolicy:
+          maxReceiveCount: 1
           deadLetterTargetArn:
-            !GetAtt 'DeadBoughtProduct.Arn'
+            !GetAtt 'DeadDeletedProduct.Arn'
 
     DeadDeletedProduct:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: ${self:provider.environment.PRODUCT_DELETED_DEAD}
+        FifoQueue: true
         MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
 
     SqsDeletedProductPolicy:
@@ -175,7 +183,6 @@ resources:
         Queues:
           - Ref: ProductDeletedQueue
         PolicyDocument:
-          Version: "2021-04-19"
           Statement:
             - Effect: Allow
               Principal: '*'
@@ -219,7 +226,7 @@ resources:
           Ref: ApiGatewayRestApi
         Type: COGNITO_USER_POOLS
         ProviderARNs:
-          - !GetAtt 'CognitoUserPool.Arn'
+          - !ImportValue ${self:provider.stage}-user-pool-arn
 
 custom:
   webpack:
