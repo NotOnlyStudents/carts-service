@@ -68,6 +68,27 @@ functions:
             authorizerId:
               Ref: ApiGatewayAuthorizer
 
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    migration:
+      dir: ./offline
+    seed: 
+      cart:
+        sources:
+          - table: ${self:provider.environment.CARTS_TABLE}
+            sources: [./offline/seeds/carts.json]
+
 resources:
   Resources:
     ProductEditedQueue:
@@ -227,24 +248,3 @@ resources:
         Type: COGNITO_USER_POOLS
         ProviderARNs:
           - !ImportValue ${self:provider.stage}-user-pool-arn
-
-custom:
-  webpack:
-    webpackConfig: ./webpack.config.js
-    includeModules: true
-  dynamodb:
-    stages:
-      - dev
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-      seed: true
-      convertEmptyValues: true
-    migration:
-      dir: ./offline
-    seed: 
-      cart:
-        sources:
-          - table: ${self:provider.environment.CARTS_TABLE}
-            sources: [./offline/seeds/carts.json]
