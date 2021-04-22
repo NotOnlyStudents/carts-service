@@ -13,12 +13,10 @@ const checkTokens = async (
 }
 
 const editCart = async (
+  cartId: string,
   event: APIGatewayProxyEvent,
   repository: CartRepositoryPatch,
 ): Promise<CartResponse> => {
-  // TODO: get email from cognito
-  const cartId = "1";
-
   try {
     const bodyTokens: ProductToken[] = JSON.parse(event.body);
     const tokens: ProductToken[] = [];

@@ -15,7 +15,9 @@ const handler: Handler = async (
   const dynamoConfig: ClientConfiguration = parseDocument(readFile(process.env.DYNAMODB_CONFIG_FILE_PATH, 'utf-8')).toJSON();
   const repository = new DynamoDbCartRepository(new DynamoDB(dynamoConfig));
 
-  return await editCart(event, repository);
+  const username: string = event.requestContext.authorizer.claims['conito:username'];
+
+  return await editCart(username, event, repository);
 };
 
 export default handler;

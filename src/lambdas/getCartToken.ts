@@ -1,16 +1,12 @@
 import { ItemNotFoundException } from '@aws/dynamodb-data-mapper';
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import CartResponse from 'src/models/CartResponse';
 import CartToken from 'src/models/CartToken';
 import CartRepositoryGet from 'src/repository/interfaces/CartRepositoryGet';
 
 const getCartToken = async (
-  event: APIGatewayProxyEvent,
+  cartId: string,
   repository: CartRepositoryGet,
 ): Promise<CartResponse> => {
-  // TODO: get cart id from cognito
-  const cartId = "1";
-
   try {
     const cart = await repository.getCart(cartId);
 
