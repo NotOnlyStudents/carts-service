@@ -9,7 +9,6 @@
     "install-db": "serverless dynamodb install",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "npm run lint -- --fix",
-    "swagger": "swagger-cli bundle openapi.yml --outfile _build/openapi.yml --type yaml",
     "swagger:validate": "swagger-cli validate docs/openApi/openApi.yml",
     "swagger:md": "npm run swagger:validate &&  widdershins --language_tabs 'shell:curl' --resolve --expandBody docs/openApi/openApi.yml -o docs/openApi.md",
     "clean": "rm -rf .serverless .dynamodb .webpack"
@@ -49,7 +48,6 @@
     "@aws/dynamodb-data-mapper": "^0.7.3",
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
     "@curveball/http-errors": "^0.4.0",
-    "@types/crypto-js": "^4.0.1",
     "aws-sdk": "^2.846.0",
     "crypto-js": "^4.0.0",
     "yaml": "^1.10.2"

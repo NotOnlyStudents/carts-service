@@ -1,5 +1,4 @@
-
-import * as SHA256 from 'crypto-js/sha256';
+import { createHmac } from "crypto";
 import Cart from "./interfaces/Cart";
 import Product from "./interfaces/Product";
 import Token from "./interfaces/Token";
@@ -25,7 +24,7 @@ class CartToken implements Token<Partial<Cart>>, TokenValidator {
     this.hmac = this.signToken();
   }
 
-  signToken = () => SHA256(JSON.stringify(this.token)).toString()
+  signToken = () => createHmac("sha256", "password").update(JSON.stringify(this.token)).digest("base64")
 
   checkTimout = () => new Date(this.token.timeout) >= new Date()
  
