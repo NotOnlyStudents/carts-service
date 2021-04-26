@@ -17,7 +17,7 @@ const handler: Handler = async (
 
   const username: string = event.requestContext.authorizer.claims['conito:username'];
 
-  return await editCart(username, event, repository);
+  return editCart(username, event, repository);
 };
 
 export default handler;
