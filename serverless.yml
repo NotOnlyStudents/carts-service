@@ -31,6 +31,8 @@ provider:
     PRODUCT_EDITED_DEAD: dead-product-edited-queue-${self:provider.stage}.fifo
     PAYED_CART_QUEUE: payed-cart-queue-${self:provider.stage}.fifo
     PAYED_CART_DEAD: dead-payed-cart-queue-${self:provider.stage}.fifo
+    NEW_USER_QUEUE: new-user-queue-${self:provider.stage}.fifo
+    NEW_USER_DEAD: dead-new-user-queue-${self:provider.stage}.fifo
     DYNAMODB_CONFIG_FILE_PATH: configs/${self:provider.stage}-dynamo.yml
 
 package:
@@ -67,6 +69,20 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+  createCart:
+    handler: src/endpoints/createCart.default
+    description: Create a new cart after a new user sign up
+    events:
+      - sqs:
+          arn:
+            !GetAtt 'NewUserQueue.Arn'
+  # emptyCart:
+  #   handler: src/endpoints/emptyCart.default
+  #   description: Create a new cart after a new user sign up
+  #   events:
+  #     - sqs:
+  #         arn:
+  #           !GetAtt 'PayedCartQueue.Arn'
 
 custom:
   webpack:
@@ -91,6 +107,50 @@ custom:
 
 resources:
   Resources:
+    NewUserQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.environment.NEW_USER_QUEUE}
+        FifoQueue: true
+        DelaySeconds: 0
+        VisibilityTimeout: 30
+        RedrivePolicy:
+          maxReceiveCount: 1
+          deadLetterTargetArn:
+            !GetAtt 'DeadNewUser.Arn'
+
+    DeadNewUser:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:provider.environment.NEW_USER_DEAD}
+        FifoQueue: true
+        MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
+
+    SqsNewUserPolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: NewUserQueue
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal: '*'
+              Action:
+                - sqs:SendMessage
+              Resource:
+                !GetAtt 'NewUserQueue.Arn'
+              Condition:
+                ArnEquals:
+                  'aws:SourceArn': arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
+
+    NewUserTopicSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint:
+          !GetAtt 'NewUserQueue.Arn'
+        Protocol: "sqs"
+        TopicArn: arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
+
     ProductEditedQueue:
       Type: AWS::SQS::Queue
       Properties:
