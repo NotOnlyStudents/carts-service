@@ -137,3 +137,5 @@ _build/
 
 ### Webpack ###
 .webpack
+
+.DS_Store
