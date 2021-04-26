@@ -76,13 +76,20 @@ functions:
       - sqs:
           arn:
             !GetAtt 'NewUserQueue.Arn'
-  # emptyCart:
-  #   handler: src/endpoints/emptyCart.default
-  #   description: Create a new cart after a new user sign up
+  emptyCart:
+    handler: src/endpoints/emptyCart.default
+    description: Empty the cart after successful payment
+    events:
+      - sqs:
+          arn:
+            !GetAtt 'PayedCartQueue.Arn'
+  # deleteProducts:
+  #   handler: src/endpoints/deleteProducts.default
+  #   description: Delete all the products deleted from the vendor
   #   events:
   #     - sqs:
   #         arn:
-  #           !GetAtt 'PayedCartQueue.Arn'
+  #           !GetAtt 'ProductDeletedQueue.Arn'
 
 custom:
   webpack:
