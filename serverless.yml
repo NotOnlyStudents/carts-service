@@ -44,13 +44,13 @@ plugins:
   - serverless-offline
 
 functions:
-  editCart:
-    handler: src/endpoints/editCart.default
+  addProductToCart:
+    handler: src/endpoints/addProduct.default
     description: New content of the buyer's cart
     events:
       - http:
           path: cart
-          method: PATCH
+          method: POST
           cors: true
           authorizer: 
             type: COGNITO_USER_POOLS
@@ -68,13 +68,6 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
-  createCart:
-    handler: src/endpoints/createCart.default
-    description: Create a new cart after a new user sign up
-    events:
-      - sqs:
-          arn:
-            !GetAtt 'NewUserQueue.Arn'
   emptyCart:
     handler: src/endpoints/emptyCart.default
     description: Empty the cart after successful payment
