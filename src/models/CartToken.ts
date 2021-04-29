@@ -1,14 +1,15 @@
-import { createHmac } from "crypto";
-import Cart from "./interfaces/Cart";
-import Product from "./interfaces/Product";
-import Token from "./interfaces/Token";
+import { createHmac } from 'crypto';
+import Cart from './interfaces/Cart';
+import Product from './interfaces/Product';
+import Token from './interfaces/Token';
 import TokenValidator from './interfaces/TokenValidator';
 
 class CartToken implements Token<Partial<Cart>>, TokenValidator {
-  token: { 
-    data: Partial<Cart>; 
-    timeout: Date; 
+  token: {
+    data: Partial<Cart>;
+    timeout: Date;
   };
+
   hmac: string;
 
   constructor(products: Product[]) {
@@ -16,21 +17,21 @@ class CartToken implements Token<Partial<Cart>>, TokenValidator {
     const timeout = new Date();
     timeout.setMinutes(timeout.getMinutes() + 5);
 
-    this.token = { 
+    this.token = {
       data: { products },
-      timeout
+      timeout,
     };
 
     this.hmac = this.signToken();
   }
 
-  signToken = () => createHmac("sha256", "password").update(JSON.stringify(this.token)).digest("base64")
+  signToken = () => createHmac('sha256', 'password').update(JSON.stringify(this.token)).digest('base64');
 
-  checkTimout = () => new Date(this.token.timeout) >= new Date()
- 
-  checkHmac = () => this.hmac === this.signToken()
+  checkTimout = () => new Date(this.token.timeout) >= new Date();
 
-  checkToken = () => this.checkTimout() && this.checkHmac()
+  checkHmac = () => this.hmac === this.signToken();
+
+  checkToken = () => this.checkTimout() && this.checkHmac();
 }
 
 export default CartToken;

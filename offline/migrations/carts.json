@@ -3,11 +3,19 @@
     "TableName": "carts-table-dev",
     "KeySchema": [
       {
-        "AttributeName": "id",
+        "AttributeName": "cartId",
         "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "id",
+        "KeyType": "RANGE"
       }
     ],
     "AttributeDefinitions": [
+      {
+        "AttributeName": "cartId",
+        "AttributeType": "S"
+      },
       {
         "AttributeName": "id",
         "AttributeType": "S"

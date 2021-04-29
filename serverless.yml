@@ -24,7 +24,6 @@ provider:
           Resource: '*'
   environment:
     CARTS_TABLE: carts-table-${self:provider.stage}
-    PRODUCTS_TABLE: products-table-${self:provider.stage}
     PRODUCT_DELETED_QUEUE: product-deleted-queue-${self:provider.stage}.fifo
     PRODUCT_DELETED_DEAD: dead-product-deleted-queue-${self:provider.stage}.fifo
     PRODUCT_EDITED_QUEUE: product-edited-queue-${self:provider.stage}.fifo
@@ -45,13 +44,13 @@ plugins:
   - serverless-offline
 
 functions:
-  editCart:
-    handler: src/endpoints/editCart.default
+  addProductToCart:
+    handler: src/endpoints/addProduct.default
     description: New content of the buyer's cart
     events:
       - http:
           path: cart
-          method: PATCH
+          method: POST
           cors: true
           authorizer: 
             type: COGNITO_USER_POOLS
@@ -69,13 +68,6 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
-  createCart:
-    handler: src/endpoints/createCart.default
-    description: Create a new cart after a new user sign up
-    events:
-      - sqs:
-          arn:
-            !GetAtt 'NewUserQueue.Arn'
   emptyCart:
     handler: src/endpoints/emptyCart.default
     description: Empty the cart after successful payment
@@ -114,50 +106,6 @@ custom:
 
 resources:
   Resources:
-    NewUserQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: ${self:provider.environment.NEW_USER_QUEUE}
-        FifoQueue: true
-        DelaySeconds: 0
-        VisibilityTimeout: 30
-        RedrivePolicy:
-          maxReceiveCount: 1
-          deadLetterTargetArn:
-            !GetAtt 'DeadNewUser.Arn'
-
-    DeadNewUser:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: ${self:provider.environment.NEW_USER_DEAD}
-        FifoQueue: true
-        MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
-
-    SqsNewUserPolicy:
-      Type: AWS::SQS::QueuePolicy
-      Properties:
-        Queues:
-          - Ref: NewUserQueue
-        PolicyDocument:
-          Statement:
-            - Effect: Allow
-              Principal: '*'
-              Action:
-                - sqs:SendMessage
-              Resource:
-                !GetAtt 'NewUserQueue.Arn'
-              Condition:
-                ArnEquals:
-                  'aws:SourceArn': arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
-
-    NewUserTopicSubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Endpoint:
-          !GetAtt 'NewUserQueue.Arn'
-        Protocol: "sqs"
-        TopicArn: arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
-
     ProductEditedQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -295,11 +243,15 @@ resources:
       Properties:
         TableName: ${self:provider.environment.CARTS_TABLE}
         AttributeDefinitions:
+          - AttributeName: cartId
+            AttributeType: S
           - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: cartId
             KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
