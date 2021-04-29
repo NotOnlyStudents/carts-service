@@ -1,11 +1,11 @@
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
+import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
 import Product from '../models/interfaces/Product';
 import Cart from '../models/interfaces/Cart';
 import CartRepositoryGet from './interfaces/CartRepositoryGet';
 import CartRepositoryPost from './interfaces/CartRepositoryPost';
 import CartRepositoryPatch from './interfaces/CartRepositoryPatch';
-import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
 import RealCart from '../models/RealCart';
 
 class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, CartRepositoryPatch {
@@ -16,6 +16,7 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
   }
 
   getCart = async (id: string): Promise<Cart> => {
+    console.log(id);
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });
     const cart = new RealCart(id);
     for await (const dynamoProduct of asyncIterator) {
@@ -24,11 +25,11 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
       cart.products.push(product);
     }
     return cart;
-  }
+  };
 
   addProductsToCart = async (id: string, products: Product[]): Promise<Cart> => {
-    const cart = new RealCart(id)
-    products.forEach(product => {
+    const cart = new RealCart(id);
+    products.forEach((product) => {
       const dynmoProduct = new DynamoDbCartProduct(
         product.id,
         id,
@@ -39,16 +40,16 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
         product.available,
         product.evidence,
         product.categories,
-        product.images
+        product.images,
       );
       cart.products.push(dynmoProduct);
       this.mapper.put(dynmoProduct);
     });
     return cart;
-  }
+  };
 
   updateCart = async (id: string, products: Product[]): Promise<Cart> => {
-    products.forEach(product => (
+    products.forEach((product) => (
       this.mapper.update(
         new DynamoDbCartProduct(
           product.id,
@@ -60,10 +61,10 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
           product.available,
           product.evidence,
           product.categories,
-          product.images
-        )
+          product.images,
+        ),
       )
-    ))
+    ));
 
     return new RealCart(id, products);
   };

@@ -10,7 +10,7 @@ import DynamoDbCartRepository from 'src/repository/DynamoDbCartRepository';
 import emptyCart from 'src/lambdas/emptyCart';
 
 const handler: SQSHandler = async (
-  event: SQSEvent
+  event: SQSEvent,
 ) => {
   try {
     const dynamoConfig: ClientConfiguration = parseDocument(readFile(process.env.DYNAMODB_CONFIG_FILE_PATH, 'utf-8')).toJSON();

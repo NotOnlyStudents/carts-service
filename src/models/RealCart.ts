@@ -3,6 +3,7 @@ import Product from './interfaces/Product';
 
 class RealCart implements Cart {
   id: string;
+
   products: Product[];
 
   constructor(id = '', products: Product[] = []) {

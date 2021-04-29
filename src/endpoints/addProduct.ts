@@ -11,7 +11,7 @@ import addProduct from 'src/lambdas/addProduct';
 import getUsername from 'src/utils/getUsername';
 
 const handler: Handler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ) => {
   const dynamoConfig: ClientConfiguration = parseDocument(readFile(process.env.DYNAMODB_CONFIG_FILE_PATH, 'utf-8')).toJSON();
   const repository = new DynamoDbCartRepository(new DynamoDB(dynamoConfig));

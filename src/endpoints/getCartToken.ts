@@ -11,14 +11,15 @@ import DynamoDbCartRepository from 'src/repository/DynamoDbCartRepository';
 import getUsername from 'src/utils/getUsername';
 
 const handler: Handler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ) => {
+  console.log(event);
   const dynamoConfig: ClientConfiguration = parseDocument(readFile(process.env.DYNAMODB_CONFIG_FILE_PATH, 'utf-8')).toJSON();
   const repository = new DynamoDbCartRepository(new DynamoDB(dynamoConfig));
 
-  const username = getUsername(event);
+  const username = await getUsername(event);
 
-  return await getCartToken(username, repository);
+  return getCartToken(username, repository);
 };
 
 export default handler;

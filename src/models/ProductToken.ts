@@ -1,29 +1,30 @@
-import { createHmac } from "crypto";
-import Product from "./interfaces/Product";
-import Token from "./interfaces/Token";
-import TokenValidator from "./interfaces/TokenValidator";
+import { createHmac } from 'crypto';
+import Product from './interfaces/Product';
+import Token from './interfaces/Token';
+import TokenValidator from './interfaces/TokenValidator';
 
 class ProductToken implements Token<Product>, TokenValidator {
-  token: { 
-    data: Product; 
+  token: {
+    data: Product;
     timeout: Date;
   };
+
   hmac: string;
 
   constructor(token: ProductToken) {
     this.token = {
-      ...token.token
+      ...token.token,
     };
     this.hmac = token.hmac;
   }
-  
-  signToken = () => createHmac("sha256", "password").update(JSON.stringify(this.token)).digest("base64")
 
-  checkTimout = () => new Date(this.token.timeout) >= new Date()
+  signToken = () => createHmac('sha256', 'password').update(JSON.stringify(this.token)).digest('base64');
 
-  checkHmac = () => this.hmac === this.signToken()
+  checkTimout = () => new Date(this.token.timeout) >= new Date();
 
-  checkToken = () => this.checkTimout() && this.checkHmac()
+  checkHmac = () => this.hmac === this.signToken();
+
+  checkToken = () => this.checkTimout() && this.checkHmac();
 }
 
 export default ProductToken;
