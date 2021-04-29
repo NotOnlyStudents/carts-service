@@ -106,50 +106,6 @@ custom:
 
 resources:
   Resources:
-    NewUserQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: ${self:provider.environment.NEW_USER_QUEUE}
-        FifoQueue: true
-        DelaySeconds: 0
-        VisibilityTimeout: 30
-        RedrivePolicy:
-          maxReceiveCount: 1
-          deadLetterTargetArn:
-            !GetAtt 'DeadNewUser.Arn'
-
-    DeadNewUser:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: ${self:provider.environment.NEW_USER_DEAD}
-        FifoQueue: true
-        MessageRetentionPeriod: 604800 #7 days, should be enough time to fix an issue and retry the messages again in case of a critical issue
-
-    SqsNewUserPolicy:
-      Type: AWS::SQS::QueuePolicy
-      Properties:
-        Queues:
-          - Ref: NewUserQueue
-        PolicyDocument:
-          Statement:
-            - Effect: Allow
-              Principal: '*'
-              Action:
-                - sqs:SendMessage
-              Resource:
-                !GetAtt 'NewUserQueue.Arn'
-              Condition:
-                ArnEquals:
-                  'aws:SourceArn': arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
-
-    NewUserTopicSubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Endpoint:
-          !GetAtt 'NewUserQueue.Arn'
-        Protocol: "sqs"
-        TopicArn: arn:aws:sns:eu-west-1:501082649462:NewUser.fifo
-
     ProductEditedQueue:
       Type: AWS::SQS::Queue
       Properties:
