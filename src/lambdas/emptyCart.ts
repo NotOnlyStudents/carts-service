@@ -9,7 +9,6 @@ const emptyCart = async (
   repository: CartRepositoryPatch,
 ): Promise<Cart> => new Promise((resolve, reject) => {
   const record = event.Records[0];
-  console.log(record);
 
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: PaymentSuccessfulMessage = JSON.parse(msg.Message);

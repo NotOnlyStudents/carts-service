@@ -35,7 +35,7 @@ const addProduct = async (
 
     return new CartResponse(204);
   } catch (error) {
-    console.error(error);
+    console.error(event, error);
     return new CartResponse(500, { message: 'Unexpected error' });
   }
 };

@@ -18,7 +18,7 @@ const handler: SQSHandler = async (
 
     await emptyCart(event, repository);
   } catch (error) {
-    console.error(error);
+    console.error(event, error);
   }
 };
 

@@ -16,7 +16,6 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
   }
 
   getCart = async (id: string): Promise<Cart> => {
-    console.log(id);
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });
     const cart = new RealCart(id);
     for await (const dynamoProduct of asyncIterator) {

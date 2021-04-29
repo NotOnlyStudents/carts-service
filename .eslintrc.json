@@ -16,6 +16,7 @@
     }
   },
   "rules": {
-    "no-restricted-syntax": [2, "ForInStatement"]
+    "no-restricted-syntax": [2, "ForInStatement"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
   }
 }
