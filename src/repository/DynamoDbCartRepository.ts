@@ -18,29 +18,32 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
   getCart = async (id: string): Promise<Cart> => {
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });
     const cart = new RealCart(id);
-    for await (const product of asyncIterator) {
+    for await (const dynamoProduct of asyncIterator) {
+      const product = { ...dynamoProduct };
+      delete product.cartId;
       cart.products.push(product);
     }
     return cart;
   }
 
-  createCart = async (cart: Cart): Promise<Cart> => {
-    cart.products.forEach(product => (
-      this.mapper.put(
-        new DynamoDbCartProduct(
-          product.id, 
-          cart.id, 
-          product.name, 
-          product.description, 
-          product.price, 
-          product.quantity, 
-          product.available, 
-          product.evidence, 
-          product.categories, 
-          product.images
-        )
-      )
-    ));
+  addProductsToCart = async (id: string, products: Product[]): Promise<Cart> => {
+    const cart = new RealCart(id)
+    products.forEach(product => {
+      const dynmoProduct = new DynamoDbCartProduct(
+        product.id,
+        id,
+        product.name,
+        product.description,
+        product.price,
+        product.quantity,
+        product.available,
+        product.evidence,
+        product.categories,
+        product.images
+      );
+      cart.products.push(dynmoProduct);
+      this.mapper.put(dynmoProduct);
+    });
     return cart;
   }
 

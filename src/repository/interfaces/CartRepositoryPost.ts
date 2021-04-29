@@ -1,7 +1,8 @@
+import Product from 'src/models/interfaces/Product';
 import Cart from '../../models/interfaces/Cart';
 
 interface CartRepositoryPost {
-  createCart(cart: Cart): Promise<Cart>;
+  addProductsToCart(id: string, products: Product[]): Promise<Cart>;
 }
 
 export default CartRepositoryPost;
