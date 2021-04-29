@@ -21,7 +21,7 @@ const emptyCart = async (
     // TODO: check
     resolve(repository.updateCart(payload.cartId, []));
   }
-  reject(validator);
+  reject(validator.errors);
 });
 
 export default emptyCart;
