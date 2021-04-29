@@ -11,7 +11,7 @@ const getCartToken = async (
     const cart = await repository.getCart(cartId);
 
     const token = new CartToken(cart.products)
-    console.log(cart);
+
     return new CartResponse(200, token);
   } catch (error) {
     console.error(error);
