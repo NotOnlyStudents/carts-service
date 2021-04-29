@@ -24,7 +24,6 @@ provider:
           Resource: '*'
   environment:
     CARTS_TABLE: carts-table-${self:provider.stage}
-    PRODUCTS_TABLE: products-table-${self:provider.stage}
     PRODUCT_DELETED_QUEUE: product-deleted-queue-${self:provider.stage}.fifo
     PRODUCT_DELETED_DEAD: dead-product-deleted-queue-${self:provider.stage}.fifo
     PRODUCT_EDITED_QUEUE: product-edited-queue-${self:provider.stage}.fifo
@@ -295,11 +294,15 @@ resources:
       Properties:
         TableName: ${self:provider.environment.CARTS_TABLE}
         AttributeDefinitions:
+          - AttributeName: cartId
+            AttributeType: S
           - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: cartId
             KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
