@@ -30,8 +30,6 @@ provider:
     PRODUCT_EDITED_DEAD: dead-product-edited-queue-${self:provider.stage}.fifo
     PAYED_CART_QUEUE: payed-cart-queue-${self:provider.stage}.fifo
     PAYED_CART_DEAD: dead-payed-cart-queue-${self:provider.stage}.fifo
-    NEW_USER_QUEUE: new-user-queue-${self:provider.stage}.fifo
-    NEW_USER_DEAD: dead-new-user-queue-${self:provider.stage}.fifo
     DYNAMODB_CONFIG_FILE_PATH: configs/${self:provider.stage}-dynamo.yml
 
 package:
@@ -63,6 +61,18 @@ functions:
       - http:
           path: cart
           method: GET
+          cors: true
+          authorizer: 
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
+  updateProductQuantity:
+    handler: src/endpoints/getCartToken.default
+    description: Update the product quantity
+    events:
+      - http:
+          path: cart/{productId}
+          method: PATCH
           cors: true
           authorizer: 
             type: COGNITO_USER_POOLS
