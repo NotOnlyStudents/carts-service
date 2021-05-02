@@ -10,18 +10,18 @@ const updateProductQuantity = async (
 ): Promise<CartResponse> => {
   try {
     const pathValidator = new Validator(event.pathParameters, {
-      productId: 'string|required'
+      productId: 'string|required',
     });
     if (pathValidator.fails()) {
-      return new CartResponse(400, { message: "Wrong productId format" });
+      return new CartResponse(400, { message: 'Wrong productId format' });
     }
 
     const payload: { quantity: number } = JSON.parse(event.body);
     const payloadValidator = new Validator(payload, {
-      quantity: 'integer|min:1'
-    })
+      quantity: 'integer|min:1',
+    });
     if (payloadValidator.fails()) {
-      return new CartResponse(400, { message: "Wrong request body format" });
+      return new CartResponse(400, { message: 'Wrong request body format' });
     }
 
     const { productId } = event.pathParameters;

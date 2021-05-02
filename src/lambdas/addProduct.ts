@@ -25,7 +25,7 @@ const addProduct = async (
       'token.data.images': 'array',
       'token.data.categories': 'array',
       'token.timeout': 'date|required',
-      'hmac': 'string|required'
+      hmac: 'string|required',
     });
     if (tokenValidator.fails()) {
       return new CartResponse(400, { message: 'Request body is in wrong format' });
