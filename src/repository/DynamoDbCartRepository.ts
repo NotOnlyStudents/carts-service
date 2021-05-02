@@ -27,25 +27,20 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
     return cart;
   };
 
-  addProductsToCart = async (id: string, products: Product[]): Promise<Cart> => {
-    const cart = new RealCart(id);
-    products.forEach((product) => {
-      const dynmoProduct = new DynamoDbCartProduct(
-        product.id,
-        id,
-        product.name,
-        product.description,
-        product.price,
-        product.quantity,
-        product.available,
-        product.evidence,
-        product.categories,
-        product.images,
-      );
-      cart.products.push(dynmoProduct);
-      this.mapper.put(dynmoProduct);
-    });
-    return cart;
+  addProductToCart = async (id: string, product: Product): Promise<Product> => {
+    const dynamoProduct = new DynamoDbCartProduct(
+      product.id,
+      id,
+      product.name,
+      product.description,
+      product.price,
+      product.quantity,
+      product.available,
+      product.evidence,
+      product.categories,
+      product.images,
+    );
+    return this.mapper.put(dynamoProduct);
   };
 
   updateProductQuantity = async (
@@ -55,7 +50,7 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
   ): Promise<Product> => {
     const expression = new UpdateExpression();
     expression.set("quantity", quantity);
-    return this.mapper.executeUpdateExpression(expression, { cartId, id: productId }, DynamoDbCartProduct)
+    return this.mapper.executeUpdateExpression(expression, { cartId, id: productId }, DynamoDbCartProduct);
   }
 
   updateCart = async (id: string, products: Product[]): Promise<Cart> => {
