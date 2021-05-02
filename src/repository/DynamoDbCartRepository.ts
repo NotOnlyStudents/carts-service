@@ -1,4 +1,4 @@
-import { UpdateExpression } from "@aws/dynamodb-expressions";
+import { equals, UpdateExpression } from "@aws/dynamodb-expressions";
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
 import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
@@ -50,7 +50,12 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
   ): Promise<Product> => {
     const expression = new UpdateExpression();
     expression.set("quantity", quantity);
-    return this.mapper.executeUpdateExpression(expression, { cartId, id: productId }, DynamoDbCartProduct);
+    return this.mapper.executeUpdateExpression(expression, { cartId, id: productId }, DynamoDbCartProduct, {
+      condition: {
+        ...equals(productId),
+        subject: 'id',
+      }
+    });
   }
 
   updateCart = async (id: string, products: Product[]): Promise<Cart> => {

@@ -1,14 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import CartResponse from 'src/models/CartResponse';
-import ProductToken from 'src/models/ProductToken';
 import CartRepositoryPatch from 'src/repository/interfaces/CartRepositoryPatch';
 import * as Validator from 'validatorjs';
-
-const checkTokens = async (
-  tokens: ProductToken[],
-): Promise<boolean> => tokens.every(
-  (token) => token.checkTimout() && token.checkHmac(),
-);
 
 const updateProductQuantity = async (
   cartId: string,
@@ -20,7 +13,7 @@ const updateProductQuantity = async (
       productId: 'string|required'
     });
     if (pathValidator.fails()) {
-      return new CartResponse(400, { message: pathValidator.errors.first('productId').toString() });
+      return new CartResponse(400, { message: "Wrong productId format" });
     }
 
     const payload: { quantity: number } = JSON.parse(event.body);
@@ -28,14 +21,13 @@ const updateProductQuantity = async (
       quantity: 'integer|min:1'
     })
     if (payloadValidator.fails()) {
-      return new CartResponse(400, { message: payloadValidator.errors.first('quantity').toString() });
+      return new CartResponse(400, { message: "Wrong request body format" });
     }
 
     const { productId } = event.pathParameters;
     const { quantity } = payload;
 
-    const product = await repository.updateProductQuantity(cartId, productId, quantity);
-    console.log(product);
+    await repository.updateProductQuantity(cartId, productId, quantity);
 
     return new CartResponse(204);
   } catch (error) {
