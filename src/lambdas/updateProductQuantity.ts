@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 import CartResponse from 'src/models/CartResponse';
 import ProductToken from 'src/models/ProductToken';
 import CartRepositoryPatch from 'src/repository/interfaces/CartRepositoryPatch';
+import * as Validator from 'validatorjs';
 
 const checkTokens = async (
   tokens: ProductToken[],
@@ -15,23 +16,26 @@ const updateProductQuantity = async (
   repository: CartRepositoryPatch,
 ): Promise<CartResponse> => {
   try {
-    const bodyTokens: ProductToken[] = JSON.parse(event.body);
-    const tokens: ProductToken[] = [];
-    for (const token of bodyTokens) {
-      tokens.push(new ProductToken(token));
+    const pathValidator = new Validator(event.pathParameters, {
+      productId: 'string|required'
+    });
+    if (pathValidator.fails()) {
+      return new CartResponse(400, { message: pathValidator.errors.first('productId').toString() });
     }
 
-    if (!Array.isArray(tokens) || !tokens.reduce((acc, token) => (
-      acc && token instanceof ProductToken
-    ), true)) {
-      return new CartResponse(400, { message: 'Request body is in wrong format' });
+    const payload: { quantity: number } = JSON.parse(event.body);
+    const payloadValidator = new Validator(payload, {
+      quantity: 'integer|min:1'
+    })
+    if (payloadValidator.fails()) {
+      return new CartResponse(400, { message: payloadValidator.errors.first('quantity').toString() });
     }
 
-    if (!await checkTokens(tokens)) return new CartResponse(500, { message: 'Token expired or invalid' });
+    const { productId } = event.pathParameters;
+    const { quantity } = payload;
 
-    // Extract products
-    const products = tokens.map((token) => token.token.data);
-    await repository.addProductsToCart(cartId, products);
+    const product = await repository.updateProductQuantity(cartId, productId, quantity);
+    console.log(product);
 
     return new CartResponse(204);
   } catch (error) {

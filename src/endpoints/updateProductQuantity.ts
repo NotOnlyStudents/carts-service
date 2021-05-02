@@ -6,9 +6,9 @@ import { DynamoDB } from 'aws-sdk';
 import { ClientConfiguration } from 'aws-sdk/clients/dynamodb';
 import { parseDocument } from 'yaml';
 import { readFileSync as readFile } from 'fs';
-import updateProductQuantity from 'src/lambdas/updateProductQuantity';
 import DynamoDbCartRepository from 'src/repository/DynamoDbCartRepository';
 import getUsername from 'src/utils/getUsername';
+import updateProductQuantity from 'src/lambdas/updateProductQuantity';
 
 const handler: Handler = async (
   event: APIGatewayProxyEvent,
@@ -18,7 +18,7 @@ const handler: Handler = async (
 
   const username = await getUsername(event);
 
-  return updateProductQuantity(username, repository);
+  return updateProductQuantity(username, event, repository);
 };
 
 export default handler;

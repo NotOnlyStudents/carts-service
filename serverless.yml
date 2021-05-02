@@ -67,7 +67,7 @@ functions:
             authorizerId:
               Ref: ApiGatewayAuthorizer
   updateProductQuantity:
-    handler: src/endpoints/getCartToken.default
+    handler: src/endpoints/updateProductQuantity.default
     description: Update the product quantity
     events:
       - http:
