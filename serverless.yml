@@ -21,6 +21,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource: '*'
   environment:
     CARTS_TABLE: carts-table-${self:provider.stage}
@@ -85,13 +86,13 @@ functions:
       - sqs:
           arn:
             !GetAtt 'PayedCartQueue.Arn'
-  # deleteProducts:
-  #   handler: src/endpoints/deleteProducts.default
-  #   description: Delete all the products deleted from the vendor
-  #   events:
-  #     - sqs:
-  #         arn:
-  #           !GetAtt 'ProductDeletedQueue.Arn'
+  removeDeletedProduct:
+    handler: src/endpoints/removeDeletedProduct.default
+    description: Delete all the products deleted from the vendor
+    events:
+      - sqs:
+          arn:
+            !GetAtt 'ProductDeletedQueue.Arn'
 
 custom:
   webpack:
