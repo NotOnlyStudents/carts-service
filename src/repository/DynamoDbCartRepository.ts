@@ -10,7 +10,11 @@ import CartRepositoryPatch from './interfaces/CartRepositoryPatch';
 import RealCart from '../models/RealCart';
 import CartRepositoryDelete from './interfaces/CartRepositoryDelete';
 
-class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, CartRepositoryPatch, CartRepositoryDelete {
+class DynamoDbCartRepository implements
+  CartRepositoryGet,
+  CartRepositoryPost,
+  CartRepositoryPatch,
+  CartRepositoryDelete {
   private mapper: DataMapper;
 
   constructor(dynamodb: DynamoDB) {
@@ -21,12 +25,12 @@ class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, C
     const asyncIterator = this.mapper.scan(DynamoDbCartProduct, {
       filter: {
         ...equals(productId),
-        subject: 'id'
-      }
+        subject: 'id',
+      },
     });
-    
+
     return this.mapper.batchDelete(asyncIterator);
-  }
+  };
 
   getCart = async (id: string): Promise<Cart> => {
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });

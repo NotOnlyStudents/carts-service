@@ -12,7 +12,7 @@ const emptyCart = async (
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: ProductDeletedMessage = JSON.parse(msg.Message);
   const validator = new Validator(payload, {
-    productId: 'required|string'
+    productId: 'required|string',
   });
 
   if (validator.passes()) {
