@@ -1,6 +1,6 @@
 {
   "Table": {
-    "TableName": "carts-table-dev",
+    "TableName": "carts-table-local",
     "KeySchema": [
       {
         "AttributeName": "cartId",

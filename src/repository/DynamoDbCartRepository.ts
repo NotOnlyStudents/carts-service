@@ -8,13 +8,29 @@ import CartRepositoryGet from './interfaces/CartRepositoryGet';
 import CartRepositoryPost from './interfaces/CartRepositoryPost';
 import CartRepositoryPatch from './interfaces/CartRepositoryPatch';
 import RealCart from '../models/RealCart';
+import CartRepositoryDelete from './interfaces/CartRepositoryDelete';
 
-class DynamoDbCartRepository implements CartRepositoryGet, CartRepositoryPost, CartRepositoryPatch {
+class DynamoDbCartRepository implements
+  CartRepositoryGet,
+  CartRepositoryPost,
+  CartRepositoryPatch,
+  CartRepositoryDelete {
   private mapper: DataMapper;
 
   constructor(dynamodb: DynamoDB) {
     this.mapper = new DataMapper({ client: dynamodb });
   }
+
+  deleteProduct = async (productId: string): Promise<AsyncIterableIterator<Product>> => {
+    const asyncIterator = this.mapper.scan(DynamoDbCartProduct, {
+      filter: {
+        ...equals(productId),
+        subject: 'id',
+      },
+    });
+
+    return this.mapper.batchDelete(asyncIterator);
+  };
 
   getCart = async (id: string): Promise<Cart> => {
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });
