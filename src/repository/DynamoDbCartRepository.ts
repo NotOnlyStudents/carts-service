@@ -21,6 +21,11 @@ class DynamoDbCartRepository implements
     this.mapper = new DataMapper({ client: dynamodb });
   }
 
+  deleteProductFromCart = async (
+    cartId: string, 
+    productId: string
+  ): Promise<Product> => this.mapper.delete(new DynamoDbCartProduct(productId, cartId));
+
   deleteProduct = async (productId: string): Promise<AsyncIterableIterator<Product>> => {
     const asyncIterator = this.mapper.scan(DynamoDbCartProduct, {
       filter: {
