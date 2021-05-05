@@ -79,6 +79,18 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: ApiGatewayAuthorizer
+  deleteProductFromCart:
+    handler: src/endpoints/deleteProduct.default
+    description: Delete the rpoduct from the cart
+    events:
+      - http:
+          path: cart/{productId}
+          method: DELETE
+          cors: true
+          authorizer: 
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
   emptyCart:
     handler: src/endpoints/emptyCart.default
     description: Empty the cart after successful payment
