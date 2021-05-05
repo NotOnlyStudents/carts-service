@@ -7,10 +7,10 @@ const deleteProduct = async (
   cartId: string,
   event: APIGatewayProxyEvent,
   repository: CartRepositoryDelete,
-  ): Promise<CartResponse> => {
+): Promise<CartResponse> => {
   try {
     const pathValidator = new Validator(event.pathParameters, {
-      productId: 'string|required'
+      productId: 'string|required',
     });
     if (pathValidator.fails()) {
       return new CartResponse(400, { message: 'Path parameter is missing' });
