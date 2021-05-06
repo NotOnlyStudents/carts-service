@@ -16,7 +16,7 @@ const addProduct = async (
     const tokenValidator = new Validator(token, {
       'token.data.id': 'string|required',
       'token.data.name': 'string|required',
-      'token.data.description': 'string|required',
+      'token.data.description': 'string',
       'token.data.price': 'integer|min:1',
       'token.data.quantity': 'integer|min:1',
       'token.data.discountPercentage': 'integer|min:0',
