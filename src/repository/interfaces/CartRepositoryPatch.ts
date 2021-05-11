@@ -1,8 +1,7 @@
 import Product from '../../models/interfaces/Product';
-import Cart from '../../models/interfaces/Cart';
 
 interface CartRepositoryPatch {
-  updateCart(id: string, products: Product[]): Promise<Cart>;
+  updateAllCarts(product: Product): Promise<Promise<Product>[]>;
   updateProductQuantity(cartId: string, productId: string, quantity: number): Promise<Product>;
 }
 

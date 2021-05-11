@@ -38,13 +38,17 @@ class DynamoDbCartProduct implements Product {
   @hashKey()
   cartId: string;
 
-  constructor(id = '', cartId = '', name = '', description = '', price = 0.0, quantity = 1, available = true, evidence = false, categories = [], images = []) {
+  @attribute()
+  discountPercentage: number;
+
+  constructor(id = '', cartId = '', name = '', description = '', price = 0.0, quantity = 1, available = true, discountPercentage = 0, evidence = false, categories = [], images = []) {
     this.id = id;
     this.cartId = cartId;
     this.name = name;
     this.description = description;
     this.price = price;
     this.quantity = quantity;
+    this.discountPercentage = discountPercentage;
     this.available = available;
     this.evidence = evidence;
     this.categories = categories;
