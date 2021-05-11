@@ -4,7 +4,7 @@ import ProductDeletedMessage from 'src/models/messages/ProductDeletedMessage';
 import CartRepositoryDelete from 'src/repository/interfaces/CartRepositoryDelete';
 import * as Validator from 'validatorjs';
 
-const emptyCart = async (
+const removeDeletedProduct = async (
   event: SQSEvent,
   repository: CartRepositoryDelete,
 ): Promise<AsyncIterableIterator<Product>> => new Promise((resolve, reject) => {
@@ -21,4 +21,4 @@ const emptyCart = async (
   reject(validator.errors);
 });
 
-export default emptyCart;
+export default removeDeletedProduct;
