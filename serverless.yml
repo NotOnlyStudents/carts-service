@@ -105,6 +105,13 @@ functions:
       - sqs:
           arn:
             !GetAtt 'ProductDeletedQueue.Arn'
+  updateEditedProduct:
+    handler: src/endpoints/updateEditedProduct.default
+    description: Update all the products edited from the vendor
+    events:
+      - sqs:
+          arn:
+            !GetAtt 'ProductEditedQueue.Arn'
 
 custom:
   webpack:

@@ -7,7 +7,7 @@ import * as Validator from 'validatorjs';
 const removeDeletedProduct = async (
   event: SQSEvent,
   repository: CartRepositoryDelete,
-): Promise<AsyncIterableIterator<Product>> => new Promise((resolve, reject) => {
+): Promise<Product[]> => {
   const record = event.Records[0];
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: ProductDeletedMessage = JSON.parse(msg.Message);
@@ -15,10 +15,11 @@ const removeDeletedProduct = async (
     productId: 'required|string',
   });
 
-  if (validator.passes()) {
-    resolve(repository.deleteProduct(payload.productId));
+  if (validator.fails()) {
+    throw validator.errors;
   }
-  reject(validator.errors);
-});
+
+  return repository.deleteProduct(payload.productId);
+};
 
 export default removeDeletedProduct;
