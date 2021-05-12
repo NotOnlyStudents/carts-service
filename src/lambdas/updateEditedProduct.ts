@@ -27,7 +27,8 @@ const updateEditedProduct = async (
   if (validator.fails()) {
     throw validator.errors;
   }
-  return await Promise.all(await repository.updateAllCarts(payload.product));
+  
+  return repository.updateAllCarts(payload.product);
 };
 
 export default updateEditedProduct;

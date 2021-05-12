@@ -7,21 +7,26 @@ import * as Validator from 'validatorjs';
 const emptyCart = async (
   event: SQSEvent,
   repository: CartRepositoryPatch,
-): Promise<Cart> => new Promise((resolve, reject) => {
+): Promise<Cart> => {
   const record = event.Records[0];
 
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: PaymentSuccessfulMessage = JSON.parse(msg.Message);
   const validator = new Validator(payload, {
-    cartId: 'required|string',
-    // paymentIntent: 'required|string'
+    cartId: 'required|string'
   });
 
-  if (validator.passes()) {
-    // TODO: check
-    resolve(repository.updateCart(payload.cartId, []));
+  if (validator.fails()) {
+    throw validator.errors;
   }
-  reject(validator.errors);
-});
+  
+  const { cartId } = payload;
+  const cart = await repository.emptyCart(cartId);
+  if (!cart) {
+    throw new Error(`Cart with id ${cartId} not found`);
+  }
+
+  return cart;
+};
 
 export default emptyCart;
