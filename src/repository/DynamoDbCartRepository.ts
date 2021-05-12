@@ -1,5 +1,5 @@
-import { equals, UpdateExpression } from '@aws/dynamodb-expressions';
-import { DataMapper } from '@aws/dynamodb-data-mapper';
+import { ConditionExpression, equals, UpdateExpression } from '@aws/dynamodb-expressions';
+import { DataMapper, ScanOptions } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
 import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
 import Product from '../models/interfaces/Product';
@@ -74,46 +74,61 @@ class DynamoDbCartRepository implements
     );
   };
 
-  private cartsScan = async (
-    productId: string,
-  ): Promise<AsyncIterableIterator<DynamoDbCartProduct>> => this.mapper.scan(DynamoDbCartProduct, {
-    filter: {
-      ...equals(productId),
-      subject: 'id',
-    },
-  });
+  deleteProduct = async (productId: string): Promise<Product[]> => {
+    const result = this.mapper.scan(DynamoDbCartProduct, {
+      filter: {
+        ...equals(productId),
+        subject: 'id'
+      }
+    });
 
-  deleteProduct = async (productId: string): Promise<AsyncIterableIterator<Product>> => {
-    const asyncIterator = await this.cartsScan(productId);
+    const products: Product[] = [];
+    for await (const product of result) {
+      products.push(await this.mapper.delete(product, { 
+        condition: {
+          ...equals(product.id),
+          subject: 'id'
+        }
+      }));
+    }
+    return products;
+  }
 
-    return this.mapper.batchDelete(asyncIterator);
-  };
+  emptyCart = async (cartId: string): Promise<Cart> => {
+    const result = this.mapper.query(DynamoDbCartProduct, { cartId });
 
-  updateAllCarts = async (product: Product): Promise<Promise<Product>[]> => {
-    const asyncIterator = await this.cartsScan(product.id);
-    let result: Promise<Product>[] = [];
-    for await (const dynamoProduct of asyncIterator) {
+    const cart = new RealCart(cartId);
+    for await (const product of result) {
+      cart.products.push(await this.mapper.delete(product, { 
+        condition: {
+          ...equals(product.id),
+          subject: 'id'
+        }
+      }));
+    }
+    
+    return result.count === 0 ? null : cart;
+  }
+
+  updateAllCarts = async (product: Product): Promise<Product[]> => {
+    const result = this.mapper.scan(DynamoDbCartProduct, {
+      filter: {
+        ...equals(product.id),
+        subject: 'id'
+      }
+    });
+
+    const products: Product[] = [];
+    for await (const dynamoProduct of result) {
       const expression = new UpdateExpression();
       expression.set('name', product.name);
       expression.set('description', product.description);
       expression.set('price', product.price);
-      expression.set('quantity', product.quantity);
       expression.set('discountPercentage', product.discountPercentage);
       expression.set('categories', product.categories);
       expression.set('images', product.images);
 
-      console.log(await this.mapper.executeUpdateExpression(
-        expression, {
-          cartId: dynamoProduct.cartId,
-          id: product.id
-        }, DynamoDbCartProduct, {
-          condition: {
-            ...equals(product.id),
-            subject: 'id',
-          },
-        },
-      ));
-      result.push(this.mapper.executeUpdateExpression(
+      products.push(await this.mapper.executeUpdateExpression(
         expression, {
           cartId: dynamoProduct.cartId,
           id: product.id
@@ -125,7 +140,7 @@ class DynamoDbCartRepository implements
         },
       ));
     }
-    return result;
+    return products;
   };
 }
 
