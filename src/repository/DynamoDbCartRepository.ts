@@ -1,5 +1,5 @@
-import { equals, UpdateExpression } from '@aws/dynamodb-expressions';
-import { DataMapper } from '@aws/dynamodb-data-mapper';
+import { ConditionExpression, equals, UpdateExpression } from '@aws/dynamodb-expressions';
+import { DataMapper, ScanOptions } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
 import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
 import Product from '../models/interfaces/Product';
@@ -26,17 +26,6 @@ class DynamoDbCartRepository implements
     productId: string,
   ): Promise<Product> => this.mapper.delete(new DynamoDbCartProduct(productId, cartId));
 
-  deleteProduct = async (productId: string): Promise<AsyncIterableIterator<Product>> => {
-    const asyncIterator = this.mapper.scan(DynamoDbCartProduct, {
-      filter: {
-        ...equals(productId),
-        subject: 'id',
-      },
-    });
-
-    return this.mapper.batchDelete(asyncIterator);
-  };
-
   getCart = async (id: string): Promise<Cart> => {
     const asyncIterator = this.mapper.query(DynamoDbCartProduct, { cartId: id });
     const cart = new RealCart(id);
@@ -48,15 +37,16 @@ class DynamoDbCartRepository implements
     return cart;
   };
 
-  addProductToCart = async (id: string, product: Product): Promise<Product> => {
+  addProductToCart = async (cartId: string, product: Product): Promise<Product> => {
     const dynamoProduct = new DynamoDbCartProduct(
       product.id,
-      id,
+      cartId,
       product.name,
       product.description,
       product.price,
       product.quantity,
       product.available,
+      product.discountPercentage,
       product.evidence,
       product.categories,
       product.images,
@@ -84,25 +74,73 @@ class DynamoDbCartRepository implements
     );
   };
 
-  updateCart = async (id: string, products: Product[]): Promise<Cart> => {
-    products.forEach((product) => (
-      this.mapper.update(
-        new DynamoDbCartProduct(
-          product.id,
-          id,
-          product.name,
-          product.description,
-          product.price,
-          product.quantity,
-          product.available,
-          product.evidence,
-          product.categories,
-          product.images,
-        ),
-      )
-    ));
+  deleteProduct = async (productId: string): Promise<Product[]> => {
+    const result = this.mapper.scan(DynamoDbCartProduct, {
+      filter: {
+        ...equals(productId),
+        subject: 'id'
+      }
+    });
 
-    return new RealCart(id, products);
+    const products: Product[] = [];
+    for await (const product of result) {
+      products.push(await this.mapper.delete(product, { 
+        condition: {
+          ...equals(product.id),
+          subject: 'id'
+        }
+      }));
+    }
+    return products;
+  }
+
+  emptyCart = async (cartId: string): Promise<Cart> => {
+    const result = this.mapper.query(DynamoDbCartProduct, { cartId });
+
+    const cart = new RealCart(cartId);
+    for await (const product of result) {
+      cart.products.push(await this.mapper.delete(product, { 
+        condition: {
+          ...equals(product.id),
+          subject: 'id'
+        }
+      }));
+    }
+    
+    return result.count === 0 ? null : cart;
+  }
+
+  updateAllCarts = async (product: Product): Promise<Product[]> => {
+    const result = this.mapper.scan(DynamoDbCartProduct, {
+      filter: {
+        ...equals(product.id),
+        subject: 'id'
+      }
+    });
+
+    const products: Product[] = [];
+    for await (const dynamoProduct of result) {
+      const expression = new UpdateExpression();
+      expression.set('name', product.name);
+      expression.set('description', product.description);
+      expression.set('price', product.price);
+      expression.set('discountPercentage', product.discountPercentage);
+      expression.set('categories', product.categories);
+      expression.set('images', product.images);
+
+      products.push(await this.mapper.executeUpdateExpression(
+        expression, {
+          cartId: dynamoProduct.cartId,
+          id: product.id
+        }, DynamoDbCartProduct, {
+          condition: {
+            ...equals(product.id),
+            subject: 'id',
+          },
+        },
+      ));
+    }
+    return products;
   };
 }
 
