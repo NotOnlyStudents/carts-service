@@ -16,7 +16,7 @@ const removeDeletedProduct = async (
   });
 
   if (validator.fails()) {
-    throw validator.errors;
+    throw new Error(validator.errors.first('productId') as string);
   }
 
   return repository.deleteProduct(payload.productId);

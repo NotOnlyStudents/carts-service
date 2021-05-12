@@ -13,13 +13,13 @@ const emptyCart = async (
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: PaymentSuccessfulMessage = JSON.parse(msg.Message);
   const validator = new Validator(payload, {
-    cartId: 'required|string'
+    cartId: 'required|string',
   });
 
   if (validator.fails()) {
-    throw validator.errors;
+    throw new Error(validator.errors.first('cartId') as string);
   }
-  
+
   const { cartId } = payload;
   const cart = await repository.emptyCart(cartId);
   if (!cart) {

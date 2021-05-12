@@ -25,9 +25,9 @@ const updateEditedProduct = async (
   });
 
   if (validator.fails()) {
-    throw validator.errors;
+    throw new Error('Payload in the wrong format');
   }
-  
+
   return repository.updateAllCarts(payload.product);
 };
 

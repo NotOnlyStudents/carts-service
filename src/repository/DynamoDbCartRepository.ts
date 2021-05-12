@@ -1,5 +1,5 @@
-import { ConditionExpression, equals, UpdateExpression } from '@aws/dynamodb-expressions';
-import { DataMapper, ScanOptions } from '@aws/dynamodb-data-mapper';
+import { equals, UpdateExpression } from '@aws/dynamodb-expressions';
+import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
 import DynamoDbCartProduct from 'src/models/DynamoDbCartProduct';
 import Product from '../models/interfaces/Product';
@@ -78,44 +78,44 @@ class DynamoDbCartRepository implements
     const result = this.mapper.scan(DynamoDbCartProduct, {
       filter: {
         ...equals(productId),
-        subject: 'id'
-      }
+        subject: 'id',
+      },
     });
 
     const products: Product[] = [];
     for await (const product of result) {
-      products.push(await this.mapper.delete(product, { 
+      products.push(await this.mapper.delete(product, {
         condition: {
           ...equals(product.id),
-          subject: 'id'
-        }
+          subject: 'id',
+        },
       }));
     }
     return products;
-  }
+  };
 
   emptyCart = async (cartId: string): Promise<Cart> => {
     const result = this.mapper.query(DynamoDbCartProduct, { cartId });
 
     const cart = new RealCart(cartId);
     for await (const product of result) {
-      cart.products.push(await this.mapper.delete(product, { 
+      cart.products.push(await this.mapper.delete(product, {
         condition: {
           ...equals(product.id),
-          subject: 'id'
-        }
+          subject: 'id',
+        },
       }));
     }
-    
+
     return result.count === 0 ? null : cart;
-  }
+  };
 
   updateAllCarts = async (product: Product): Promise<Product[]> => {
     const result = this.mapper.scan(DynamoDbCartProduct, {
       filter: {
         ...equals(product.id),
-        subject: 'id'
-      }
+        subject: 'id',
+      },
     });
 
     const products: Product[] = [];
@@ -131,7 +131,7 @@ class DynamoDbCartRepository implements
       products.push(await this.mapper.executeUpdateExpression(
         expression, {
           cartId: dynamoProduct.cartId,
-          id: product.id
+          id: product.id,
         }, DynamoDbCartProduct, {
           condition: {
             ...equals(product.id),
