@@ -46,7 +46,7 @@ class DynamoDbCartRepository implements
       product.price,
       product.quantity,
       product.available,
-      product.discountPercentage,
+      product.discount,
       product.evidence,
       product.categories,
       product.images,
@@ -124,7 +124,7 @@ class DynamoDbCartRepository implements
       expression.set('name', product.name);
       expression.set('description', product.description);
       expression.set('price', product.price);
-      expression.set('discountPercentage', product.discountPercentage);
+      expression.set('discountPercentage', product.discount);
       expression.set('categories', product.categories);
       expression.set('images', product.images);
 

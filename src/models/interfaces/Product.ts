@@ -4,7 +4,7 @@ interface Product {
   description: string;
   price: number;
   quantity: number;
-  discountPercentage: number;
+  discount: number;
   available: boolean;
   evidence: boolean;
   categories: string[];
