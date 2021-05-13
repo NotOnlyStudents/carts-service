@@ -78,6 +78,7 @@ Add a new product to the buyer's cart
         "string"
       ],
       "quantity": 0,
+      "discount": 0,
       "price": 0,
       "available": true,
       "evidence": true,
@@ -103,6 +104,7 @@ Add a new product to the buyer's cart
 |»»» description|body|string|false|none|
 |»»» images|body|[string]|false|none|
 |»»» quantity|body|integer(int32)|true|none|
+|»»» discount|body|integer(int32)|false|none|
 |»»» price|body|integer(int64)|true|none|
 |»»» available|body|boolean|false|none|
 |»»» evidence|body|boolean|false|none|
@@ -194,6 +196,7 @@ Obtain information about a user personal cart
             "string"
           ],
           "quantity": 0,
+          "discount": 0,
           "price": 0,
           "available": true,
           "evidence": true,
@@ -231,6 +234,7 @@ Status Code **200**
 |»»»» description|string|false|none|none|
 |»»»» images|[string]|false|none|none|
 |»»»» quantity|integer(int32)|true|none|none|
+|»»»» discount|integer(int32)|false|none|none|
 |»»»» price|integer(int64)|true|none|none|
 |»»»» available|boolean|false|none|none|
 |»»»» evidence|boolean|false|none|none|
