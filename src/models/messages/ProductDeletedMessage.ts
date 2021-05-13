@@ -1,5 +1,5 @@
 export default class ProductDeletedMessage {
-  constructor(readonly productId: string) {
-    this.productId = productId;
+  constructor(readonly id: string) {
+    this.id = id;
   }
 }

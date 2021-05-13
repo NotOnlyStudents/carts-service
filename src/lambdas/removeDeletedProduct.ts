@@ -12,14 +12,14 @@ const removeDeletedProduct = async (
   const msg: SNSMessage = JSON.parse(record.body);
   const payload: ProductDeletedMessage = JSON.parse(msg.Message);
   const validator = new Validator(payload, {
-    productId: 'required|string',
+    clearImmediate: 'required|string',
   });
 
   if (validator.fails()) {
     throw new Error(validator.errors.first('productId') as string);
   }
 
-  return repository.deleteProduct(payload.productId);
+  return repository.deleteProduct(payload.id);
 };
 
 export default removeDeletedProduct;
