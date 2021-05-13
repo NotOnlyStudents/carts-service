@@ -19,7 +19,7 @@ const addProduct = async (
       'token.data.description': 'string',
       'token.data.price': 'integer|min:1',
       'token.data.quantity': 'integer|min:1',
-      'token.data.discountPercentage': 'integer|min:0',
+      'token.data.discount': 'integer|min:0',
       'token.data.available': 'boolean',
       'token.data.evidence': 'boolean',
       'token.data.images': 'array',
