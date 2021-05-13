@@ -13,6 +13,9 @@ properties:
   quantity:
     type: integer
     format: int32 # int
+  discount:
+    type: integer
+    format: int32 # int
   price:          # price in centes
     type: integer
     format: int64 # long int
