@@ -1,15 +1,15 @@
-import ProductToken from "../src/models/ProductToken";
-import Product from "../src/models/DynamoDbCartProduct";
+import ProductToken from '../src/models/ProductToken';
+import Product from '../src/models/DynamoDbCartProduct';
 
-describe(`Check the product token`, () => {
+describe('Check the product token', () => {
   test('Valid product token', () => {
     const token = new ProductToken({
       token: {
-        data: new Product(`1`,`1`,`Prova`,`Descrizione`,1250,12,true,0,false,[],[]),
-        timeout: new Date(Date.now() + 600_000)
+        data: new Product('1', '1', 'Prova', 'Descrizione', 1250, 12, true, 0, false, [], []),
+        timeout: new Date(Date.now() + 600_000),
       },
-      hmac: "",
-      signToken: () => ""
+      hmac: '',
+      signToken: () => '',
     });
     token.hmac = token.signToken();
 
@@ -19,11 +19,11 @@ describe(`Check the product token`, () => {
   test('Invalid product token cause of timeout', () => {
     const token = new ProductToken({
       token: {
-        data: new Product(`1`,`1`,`Prova`,`Descrizione`,1250,12,true,0,false,[],[]),
-        timeout: new Date(Date.now() - 1000)  // timeout expired a second ago
+        data: new Product('1', '1', 'Prova', 'Descrizione', 1250, 12, true, 0, false, [], []),
+        timeout: new Date(Date.now() - 1000), // timeout expired a second ago
       },
-      hmac: "",
-      signToken: () => ""
+      hmac: '',
+      signToken: () => '',
     });
     token.hmac = token.signToken();
 
@@ -33,11 +33,11 @@ describe(`Check the product token`, () => {
   test('Invalid product token cause of hmac', () => {
     const token = new ProductToken({
       token: {
-        data: new Product(`1`,`1`,`Prova`,`Descrizione`,1250,12,true,0,false,[],[]),
-        timeout: new Date(Date.now() + 600_000)
+        data: new Product('1', '1', 'Prova', 'Descrizione', 1250, 12, true, 0, false, [], []),
+        timeout: new Date(Date.now() + 600_000),
       },
-      hmac: "",
-      signToken: () => ""
+      hmac: '',
+      signToken: () => '',
     });
     token.hmac = token.signToken();
 
