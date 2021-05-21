@@ -30,7 +30,7 @@ describe(`Check the cart token`, () => {
       new Product(`3`,`1`,`Prova3`,`Descrizione`,1250,12,true,0,false,[],[])
     ]);
 
-    token.token.data.price = 0;
+    token.token.data.products[0].price = 0;
 
     expect(token.checkToken()).toBeFalsy();
   });
