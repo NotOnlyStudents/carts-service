@@ -8,7 +8,7 @@ class CartResponse implements APIGatewayProxyResult {
 
   readonly body: string;
 
-  constructor(statusCode: number, body?: Partial<CartResponseBodyType>) {
+  constructor(statusCode: number, body?: CartResponseBodyType) {
     this.statusCode = statusCode;
     this.body = JSON.stringify({ data: body });
   }

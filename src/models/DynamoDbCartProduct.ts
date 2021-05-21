@@ -41,7 +41,7 @@ class DynamoDbCartProduct implements Product {
   @attribute()
   discount: number;
 
-  constructor(id = '', cartId = '', name = '', description = '', price = 0.0, quantity = 1, available = true, discount = 0, evidence = false, categories = [], images = []) {
+  constructor(id = '', cartId = '', name = '', description = '', price = 0.0, quantity = 1, available = true, discount = 0, evidence = false, categories: string[] = [], images: string [] = []) {
     this.id = id;
     this.cartId = cartId;
     this.name = name;

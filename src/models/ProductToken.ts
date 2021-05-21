@@ -11,7 +11,7 @@ class ProductToken implements Token<Product>, TokenValidator {
 
   hmac: string;
 
-  constructor(token: ProductToken) {
+  constructor(token: Token<Product>) {
     this.token = {
       ...token.token,
     };
