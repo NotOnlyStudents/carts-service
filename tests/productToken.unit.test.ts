@@ -20,7 +20,7 @@ describe(`Check the product token`, () => {
     const token = new ProductToken({
       token: {
         data: new Product(`1`,`1`,`Prova`,`Descrizione`,1250,12,true,0,false,[],[]),
-        timeout: new Date(Date.now() - 1000)
+        timeout: new Date(Date.now() - 1000)  // timeout expired a second ago
       },
       hmac: "",
       signToken: () => ""
