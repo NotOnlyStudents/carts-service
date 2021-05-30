@@ -16,6 +16,8 @@ servers:
 paths:
   /cart:
     $ref: "./carts.yml"
+  /cart/{productId}: 
+    $ref: "./cartProductById.yml"
 
 components:
   securitySchemes:

@@ -48,72 +48,67 @@ Base URLs:
 
 The carts service
 
-## patch__cart
+## post__cart
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X PATCH https://app.swaggerhub.com/apis/NotOnlyStudents/Backend/0.0.1/cart \
+curl -X POST https://app.swaggerhub.com/apis/NotOnlyStudents/Backend/0.0.1/cart \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -H 'Authorization: Bearer {access-token}'
 
 ```
 
-`PATCH /cart`
+`POST /cart`
 
-New content of the buyer's cart
+Add a new product to the buyer's cart
 
 > Body parameter
 
 ```json
 {
-  "product-tokens": [
-    {
-      "token": {
-        "data": {
-          "id": "string",
-          "name": "string",
-          "description": "string",
-          "images": [
-            "string"
-          ],
-          "quantity": 0,
-          "price": 0,
-          "available": true,
-          "evidence": true,
-          "category": [
-            "string"
-          ]
-        },
-        "timeout": "2019-08-24T14:15:22Z"
-      },
-      "hmac": "stringstringstringstringstringstringstringst"
-    }
-  ]
+  "token": {
+    "data": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "images": [
+        "string"
+      ],
+      "quantity": 0,
+      "price": 0,
+      "available": true,
+      "evidence": true,
+      "category": [
+        "string"
+      ]
+    },
+    "timeout": "2019-08-24T14:15:22Z"
+  },
+  "hmac": "stringstringstringstringstringstringstringst"
 }
 ```
 
-<h3 id="patch__cart-parameters">Parameters</h3>
+<h3 id="post__cart-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |body|body|object|true|none|
-|» product-tokens|body|[object]|false|none|
-|»» token|body|object|true|none|
-|»»» data|body|[#/paths/~1cart/patch/requestBody/content/application~1json/schema/properties/product-tokens/items/properties/token/properties/data](#schema#/paths/~1cart/patch/requestbody/content/application~1json/schema/properties/product-tokens/items/properties/token/properties/data)|false|none|
-|»»»» id|body|string|true|none|
-|»»»» name|body|string|true|none|
-|»»»» description|body|string|false|none|
-|»»»» images|body|[string]|false|none|
-|»»»» quantity|body|integer(int32)|true|none|
-|»»»» price|body|integer(int64)|true|none|
-|»»»» available|body|boolean|false|none|
-|»»»» evidence|body|boolean|false|none|
-|»»»» category|body|[string]|true|none|
-|»»» timeout|body|string(date-time)|false|none|
-|»» hmac|body|string(byte)|true|none|
+|» token|body|object|true|none|
+|»» data|body|[#/paths/~1cart/post/requestBody/content/application~1json/schema/properties/token/properties/data](#schema#/paths/~1cart/post/requestbody/content/application~1json/schema/properties/token/properties/data)|false|none|
+|»»» id|body|string|true|none|
+|»»» name|body|string|true|none|
+|»»» description|body|string|false|none|
+|»»» images|body|[string]|false|none|
+|»»» quantity|body|integer(int32)|true|none|
+|»»» price|body|integer(int64)|true|none|
+|»»» available|body|boolean|false|none|
+|»»» evidence|body|boolean|false|none|
+|»»» category|body|[string]|true|none|
+|»» timeout|body|string(date-time)|false|none|
+|» hmac|body|string(byte)|true|none|
 
 > Example responses
 
@@ -125,17 +120,17 @@ New content of the buyer's cart
 }
 ```
 
-<h3 id="patch__cart-responses">Responses</h3>
+<h3 id="post__cart-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successfull modification of the cart|None|
+|204|[No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)|Successfull modification of the cart|None|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Invalid request|Inline|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|No authentication information was given, denied|Inline|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Wrong permissions, denied|Inline|
 |5XX|Unknown|Unexpected server error|Inline|
 
-<h3 id="patch__cart-responseschema">Response Schema</h3>
+<h3 id="post__cart-responseschema">Response Schema</h3>
 
 Status Code **400**
 
@@ -230,7 +225,7 @@ Status Code **200**
 |---|---|---|---|---|
 |» token|object|true|none|none|
 |»» data|object|false|none|none|
-|»»» products|[[#/paths/~1cart/patch/requestBody/content/application~1json/schema/properties/product-tokens/items/properties/token/properties/data](#schema#/paths/~1cart/patch/requestbody/content/application~1json/schema/properties/product-tokens/items/properties/token/properties/data)]|true|none|none|
+|»»» products|[[#/paths/~1cart/post/requestBody/content/application~1json/schema/properties/token/properties/data](#schema#/paths/~1cart/post/requestbody/content/application~1json/schema/properties/token/properties/data)]|true|none|none|
 |»»»» id|string|true|none|none|
 |»»»» name|string|true|none|none|
 |»»»» description|string|false|none|none|
@@ -258,5 +253,89 @@ Status Code **5XX**
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
 oAuth ( Scopes: read )
+</aside>
+
+## patch__cart_{productId}
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X PATCH https://app.swaggerhub.com/apis/NotOnlyStudents/Backend/0.0.1/cart/{productId} \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+`PATCH /cart/{productId}`
+
+Edit a product quantity in the buyer's cart
+
+> Body parameter
+
+```json
+{
+  "quantity": 0
+}
+```
+
+<h3 id="patch__cart_{productid}-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|productId|path|string|true|The id of the desired product|
+|body|body|object|true|none|
+|» quantity|body|integer(int32)|false|none|
+
+> Example responses
+
+> 400 Response
+
+```json
+{
+  "message": "string"
+}
+```
+
+<h3 id="patch__cart_{productid}-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|204|[No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)|Successfull modification of the product quantity in the cart|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Invalid request|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|No authentication information was given, denied|Inline|
+|403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Wrong permissions, denied|Inline|
+|5XX|Unknown|Unexpected server error|Inline|
+
+<h3 id="patch__cart_{productid}-responseschema">Response Schema</h3>
+
+Status Code **400**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» message|string|true|none|none|
+
+Status Code **401**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» message|string|true|none|none|
+
+Status Code **403**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» message|string|true|none|none|
+
+Status Code **5XX**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» message|string|true|none|none|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+oAuth ( Scopes: writeUser )
 </aside>
 

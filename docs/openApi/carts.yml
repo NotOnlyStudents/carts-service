@@ -1,5 +1,5 @@
-patch:
-  description: New content of the buyer's cart 
+post:
+  description: Add a new product to the buyer's cart 
   tags:
     - carts
   security:
@@ -10,14 +10,9 @@ patch:
     content:
       application/json:
         schema:
-          type: object
-          properties:
-            product-tokens:
-              type: array
-              items:
-                $ref: './schemas/product-token.yml'
+          $ref: './schemas/product-token.yml'
   responses:
-    '200':
+    '204':
       description: Successfull modification of the cart
     '400':
       description: Invalid request
